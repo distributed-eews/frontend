@@ -1,6 +1,10 @@
+import { IChannel } from "./channels";
+
 export interface IStation {
-    id: string;
+    code: string;
+    lat: number | string;
+    long: number | string;
     name: string;
-    latitude: number;
-    longitude: number;
+    elevation: number | string;
+    channels?: IChannel[]
 }

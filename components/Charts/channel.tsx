@@ -1,13 +1,17 @@
-import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Line, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from "recharts";
 import dynamic from "next/dynamic";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { IChannel } from "@/lib/interfaces/channels";
+import { IStation } from "@/lib/interfaces/stations";
 const LineChart = dynamic(() => import("recharts").then((recharts) => recharts.LineChart), { ssr: false });
 
-export const StationChart: React.FC<{ waveform: number[]; channel: IChannel }> = ({ waveform, channel }) => {
+export const ChannelChart: React.FC<{ waveform: number[]; channel: IChannel; station: IStation }> = ({
+  waveform,
+  channel,
+  station,
+}) => {
   const now = new Date();
-  console.log(channel);
   const newdata = waveform.map((value, idx) => {
     return {
       value: value,
@@ -20,9 +24,9 @@ export const StationChart: React.FC<{ waveform: number[]; channel: IChannel }> =
     <div className="flex">
       <div className="flex px-2 relative">
         <div className="flex flex-col h-full justify-center">
-          <h6>JAGI</h6>
+          <h6>{station.code}</h6>
           <div className="w-full border border-black"></div>
-          <h6>[BHZ]</h6>
+          <h6>{`[${channel.code}]`}</h6>
         </div>
         <div className="absolute -right-1 translate-x-full top-0 z-10 h-full">
           <p>{`amax:${max}`}</p>
@@ -51,6 +55,10 @@ export const StationChart: React.FC<{ waveform: number[]; channel: IChannel }> =
               tick={false}
             />
             <Line type="monotone" dataKey="value" stroke="#8884d8" dot={false} />
+            <ReferenceLine
+                x={now.getTime() + 10 * 1000}
+                stroke="red"
+              />
           </LineChart>
         </ResponsiveContainer>
       </div>

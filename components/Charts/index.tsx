@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { StationChart } from "./station";
+import { ChannelChart } from "./channel";
 import { DATA } from "../data";
-import RenderIfVisible from 'react-render-if-visible'
+import RenderIfVisible from "react-render-if-visible";
+import stationdata from "../stations.json";
 
 export const StationCharts = () => {
   const [count, setCount] = useState(3000);
@@ -20,13 +21,13 @@ export const StationCharts = () => {
 
   return (
     <div className="max-h-screen w-full border-4 border-black p-4 overflow-auto">
-      {Array(100)
-        .fill(null)
-        .map((_, idx) => (
-          <RenderIfVisible key={`station-chart-${idx}`} defaultHeight={100} visibleOffset={300} >
-            <StationChart waveform={data} channel={{ channel: `idx-${idx}`, enabled: true, station: "JAGI" }} />
+      {stationdata.map((station) => {
+        return station.channels.map((channel) => (
+          <RenderIfVisible key={`${station.code}-${channel.code}`} defaultHeight={100} visibleOffset={300}>
+            <ChannelChart waveform={data} channel={channel} station={station} />
           </RenderIfVisible>
-        ))}
+        ));
+      })}
     </div>
   );
 };

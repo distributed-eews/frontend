@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import { MapGL } from "@/components/map";
 import { Navbar } from "@/components/Navbar";
-import { StationChart } from "@/components/Charts/station";
+import { StationChart } from "@/components/Charts/channel";
 import { StationCharts } from "@/components/Charts";
 
 const inter = Inter({ subsets: ["latin"] });
