@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StationChart } from "./station";
 import { DATA } from "../data";
+import RenderIfVisible from 'react-render-if-visible'
 
 export const StationCharts = () => {
   const [count, setCount] = useState(3000);
@@ -19,14 +20,12 @@ export const StationCharts = () => {
 
   return (
     <div className="max-h-screen w-full border-4 border-black p-4 overflow-auto">
-      {Array(10)
+      {Array(100)
         .fill(null)
         .map((_, idx) => (
-          <StationChart
-            waveform={data}
-            channel={{ channel: "BHZ", enabled: true, station: "JAGI" }}
-            key={`station-chart-${idx}`}
-          />
+          <RenderIfVisible key={`station-chart-${idx}`} defaultHeight={100} visibleOffset={300} >
+            <StationChart waveform={data} channel={{ channel: `idx-${idx}`, enabled: true, station: "JAGI" }} />
+          </RenderIfVisible>
         ))}
     </div>
   );

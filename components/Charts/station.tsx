@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import { IChannel } from "@/lib/interfaces/channels";
 const LineChart = dynamic(() => import("recharts").then((recharts) => recharts.LineChart), { ssr: false });
 
-export const StationChart: React.FC<{ waveform: number[], channel: IChannel }> = ({ waveform, channel }) => {
+export const StationChart: React.FC<{ waveform: number[]; channel: IChannel }> = ({ waveform, channel }) => {
   const now = new Date();
-  console.log(channel)
+  console.log(channel);
   const newdata = waveform.map((value, idx) => {
     return {
       value: value,
       time: now.getTime() + idx * 50,
     };
   });
+  const mean = waveform.reduce((a, b) => Math.abs(a) + Math.abs(b)) / waveform.length;
+  const max = waveform.reduce((a, b) => Math.max(Math.abs(a), Math.abs(b)), 0);
   return (
     <div className="flex">
       <div className="flex px-2 relative">
@@ -23,12 +25,12 @@ export const StationChart: React.FC<{ waveform: number[], channel: IChannel }> =
           <h6>[BHZ]</h6>
         </div>
         <div className="absolute -right-1 translate-x-full top-0 z-10 h-full">
-          <p>amax:aaaaaaa</p>
-          <p>mean: bbbb</p>
+          <p>{`amax:${max}`}</p>
+          <p>{`mean:${mean}`}</p>
         </div>
       </div>
       <div className="w-full pt-4">
-        <ResponsiveContainer width="100%" className="" height={100}>
+        <ResponsiveContainer width="100%" className="" height={150}>
           <LineChart data={newdata} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <XAxis
               dataKey="time"
