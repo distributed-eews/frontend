@@ -10,7 +10,6 @@ export const StationCharts = () => {
   useEffect(() => {
     //Implementing the setInterval method
     const interval = setInterval(() => {
-      console.log("setInterval", count);
       setCount(count + 20);
     }, 1000);
 

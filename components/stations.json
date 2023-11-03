@@ -356,48 +356,6 @@
           "azimuth": 0.0,
           "dip": -90.0,
           "sample_rate": 20.0
-        },
-        {
-          "code": "BHN",
-          "depth": 2.0,
-          "azimuth": 0.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHE",
-          "depth": 2.0,
-          "azimuth": 90.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHZ",
-          "depth": 2.0,
-          "azimuth": 0.0,
-          "dip": -90.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHN",
-          "depth": 2.0,
-          "azimuth": 0.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHE",
-          "depth": 2.0,
-          "azimuth": 90.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHZ",
-          "depth": 2.0,
-          "azimuth": 0.0,
-          "dip": -90.0,
-          "sample_rate": 20.0
         }
       ]
     },
@@ -558,27 +516,6 @@
       "elevation": "107",
       "name": "GEOFON Station Gunungsitoli, Nias",
       "channels": [
-        {
-          "code": "BHN",
-          "depth": 0.0,
-          "azimuth": 0.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHE",
-          "depth": 0.0,
-          "azimuth": 90.0,
-          "dip": 0.0,
-          "sample_rate": 20.0
-        },
-        {
-          "code": "BHZ",
-          "depth": 0.0,
-          "azimuth": 0.0,
-          "dip": -90.0,
-          "sample_rate": 20.0
-        },
         {
           "code": "BHN",
           "depth": 0.0,
