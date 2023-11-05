@@ -3,10 +3,19 @@ import { Inter } from "next/font/google";
 import { MapGL } from "@/components/Map";
 import { Navbar } from "@/components/Navbar";
 import { StationCharts } from "@/components/Charts";
+import { useEffect } from "react";
+import { onWaveformMessage } from "@/lib/functions/onWaveformMessage";
+import { useEEWS } from "@/lib/hooks/useEEWS";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const {} = useEEWS()
+  useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:8080/ws`);
+    socket.onmessage = onWaveformMessage();
+  }, []);
+
   return (
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>
       <Navbar />
@@ -20,7 +29,7 @@ export default function Home() {
           </div>
         </div>
         <div className="w-full min-h-screen bg-red-300">
-          <StationCharts/>
+          <StationCharts />
         </div>
       </div>
     </main>
