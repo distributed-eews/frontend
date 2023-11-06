@@ -19,10 +19,10 @@ export const getPulseDot = (map: MapRef) => {
 
     // Call once before every frame where the icon will be used.
     render: function () {
-      const duration = 2000;
+      const duration = 5000;
       const t = (performance.now() % duration) / duration;
 
-      const radius = (size / 2) * 0.05;
+      const radius = (size / 2) * 0.01;
       const outerRadius = (size / 2) * 0.7 * t + radius;
       const context = this.context;
       if (!!context) {
@@ -30,7 +30,7 @@ export const getPulseDot = (map: MapRef) => {
         context.clearRect(0, 0, this.width, this.height);
         context.beginPath();
         context.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
-        context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+        context.fillStyle = `rgba(255, 200, 200, ${Math.min(0.7, 1 - t)})`;
         context.fill();
 
         // Draw the inner circle.

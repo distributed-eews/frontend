@@ -9,14 +9,34 @@ export const Station: React.FC<IStation> = ({ code, elevation, lat, long, name, 
 
   const popup = useMemo(() => {
     return new mapboxgl.Popup().setHTML(
-      `<div>
-        <p>Kode: ${code}</p>
-        <p>Nama: ${name}</p>
-        <p>Lat:${lat}</p>
-        <p>Long:${long}</p>
-        <p>Elevation:${elevation}</p>
-        <p>Channel: ${channels!.map(c=>c.code).join(", ")}</p>
-        </div>`
+      `
+      <table>
+        <tr>
+          <td>Kode</td>
+          <td>: ${code}</td>
+        </tr>
+        <tr>
+          <td>Nama</td>
+          <td>: ${name}</td>
+        </tr>
+        <tr>
+          <td>Lat</td>
+          <td>: ${lat}</td>
+        </tr>
+        <tr>
+          <td>Long</td>
+          <td>: ${long}</td>
+        </tr>
+        <tr>
+          <td>Elevation</td>
+          <td>: ${elevation}</td>
+        </tr>
+        <tr>
+          <td>Channel</td>
+          <td>: ${channels!.map((c) => c.code).join(", ")}</td>
+        </tr>
+      </table>
+      <div>`
     );
   }, []);
 
