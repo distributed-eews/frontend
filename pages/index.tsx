@@ -6,6 +6,7 @@ import { StationCharts } from "@/components/Charts";
 import { useEffect, useState } from "react";
 import { onWaveformMessage } from "@/lib/functions/onWaveformMessage";
 import { useEEWS } from "@/lib/hooks/useEEWS";
+import { ControlPanel } from "@/components/Panel";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +32,8 @@ export default function Home() {
             <MapGL />
           </div>
           <div id="station-control" className="bg-yellow-300 w-1/4">
-            Kontrol stasiun/mode
+            <h4>Panel</h4>
+            <ControlPanel />
           </div>
         </div>
         <div className="w-full min-h-screen bg-red-300">

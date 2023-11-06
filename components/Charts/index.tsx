@@ -15,8 +15,13 @@ export const StationCharts = () => {
   channels.sort((a, b) => (`${a.stationCode}${a.code}` > `${b.stationCode}${b.code}` ? 1 : -1));
   return (
     <div className="max-h-screen w-full border-4 border-black p-4 overflow-auto">
-      {channels.map((chan, idx) => (
+      {channels.filter(chan=>chan.waveform.data.length > 0).map((chan, idx) => (
         <RenderIfVisible key={`${chan.stationCode}${chan.code}${idx}`} defaultHeight={100} visibleOffset={300}>
+          <ChannelChart channel={chan} />
+        </RenderIfVisible>
+      ))}
+      {channels.filter(chan=>chan.waveform.data.length == 0).map((chan, idx) => (
+        <RenderIfVisible key={`empty${chan.stationCode}${chan.code}${idx}`} defaultHeight={100} visibleOffset={300}>
           <ChannelChart channel={chan} />
         </RenderIfVisible>
       ))}
