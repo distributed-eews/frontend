@@ -40,16 +40,14 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (chan_data.length >= 10) {
       chan_data = chan_data.slice(1, 10);
     }
-    // console.log(chans[key].code);
     chan_data.push(packet);
     chans[key].waveform.data = chan_data;
-    // console.log(key, chan_data.length, new Date().getTime());
     _setChannels(chans);
   };
   const setEvents = () => {};
 
   useEffect(() => {
-    async function setStationsAndChannels() {
+    async function fetchStations() {
       const res = await AxiosClient.get("/api/stations");
       const _stations: IStation[] = (res.data as any[]).map((st) => ({
         ...st,
@@ -59,7 +57,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }));
       _setStations(_stations);
     }
-    setStationsAndChannels();
+    fetchStations();
   }, []);
 
   // update channels if stations changes

@@ -40,11 +40,12 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
               type="number"
               domain={([dataMin, dataMax]) => {
                 const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax));
-                return [-5000, 5000];
+                return [-absMax, absMax];
               }}
-              tick={false}
+              ticks={[0]}
             />
             <Line type="monotone" dataKey="value" stroke="#8884d8" dot={false} />
+            <ReferenceLine y={0} color="#000000" />
             {channel.waveform.arrival && <ReferenceLine x={new Date(channel.waveform.arrival).getTime()} />}
           </LineChart>
         </ResponsiveContainer>

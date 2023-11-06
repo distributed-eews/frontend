@@ -3,18 +3,24 @@ import { Inter } from "next/font/google";
 import { MapGL } from "@/components/Map";
 import { Navbar } from "@/components/Navbar";
 import { StationCharts } from "@/components/Charts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { onWaveformMessage } from "@/lib/functions/onWaveformMessage";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const {} = useEEWS()
+  const { setChannelsWaveform, channels } = useEEWS();
+  const [connection, setConnection] = useState<WebSocket>();
   useEffect(() => {
+    if (!!connection || Object.entries(channels).length == 0) return;
     const socket = new WebSocket(`ws://localhost:8080/ws`);
-    socket.onmessage = onWaveformMessage();
-  }, []);
+    socket.onopen = () => {
+      console.log("Connect");
+    };
+    socket.onmessage = onWaveformMessage(setChannelsWaveform);
+    setConnection(socket);
+  }, [connection, channels, setChannelsWaveform]);
 
   return (
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>
