@@ -6,6 +6,6 @@ export interface IStation {
     long: number | string;
     name: string;
     elevation: number | string;
-    channels?: IChannel[]
+    channels: IChannel[]
     status: "ACTIVE" | "ENABLED" | "DISABLED"
 }

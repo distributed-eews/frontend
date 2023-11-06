@@ -10,17 +10,17 @@ import { useEEWS } from "@/lib/hooks/useEEWS";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { setChannelsWaveform, channels } = useEEWS();
+  const { setChannelsWaveform, stations } = useEEWS();
   const [connection, setConnection] = useState<WebSocket>();
   useEffect(() => {
-    if (!!connection || Object.entries(channels).length == 0) return;
+    if (!!connection || Object.entries(stations).length == 0) return;
     const socket = new WebSocket(`ws://localhost:8080/ws`);
     socket.onopen = () => {
       console.log("Connect");
     };
     socket.onmessage = onWaveformMessage(setChannelsWaveform);
     setConnection(socket);
-  }, [connection, channels, setChannelsWaveform]);
+  }, [connection, setChannelsWaveform, stations]);
 
   return (
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>
