@@ -33,8 +33,8 @@ export const MapGL: React.FC = () => {
       ref={mapRef}
       onLoad={onMapLoad}
     >
-      {stations.map((val) => (
-        <Station key={`marker-station-${val.code}`} {...val} />
+      {Object.entries(stations).map(([code, val]) => (
+        <Station key={`marker-station-${code}`} {...val} />
       ))}
       <EventMarker />
     </Map>

@@ -6,7 +6,7 @@ import { IChannel } from "../interfaces/channels";
 import { AxiosClient } from "../axios";
 
 interface IEEWSContext {
-  stations: IStation[]; // for control panels, and map markers
+  stations: { [index: string]: IStation }; // for control panels, and map markers
   channels: { [index: string]: IChannel }; // to show waveforms data
   setChannelsWaveform: (key: string, packet: IPacket) => void; // update data from websocket connection
   setChannelStatus: (stations: string, channels: string) => void; // enable/disable channels
@@ -15,7 +15,7 @@ interface IEEWSContext {
 }
 
 export const EEWSContext = createContext<IEEWSContext>({
-  stations: [],
+  stations: {},
   channels: {},
   setChannelStatus: (waves) => {},
   setChannelsWaveform: (channels) => {},
@@ -24,7 +24,7 @@ export const EEWSContext = createContext<IEEWSContext>({
 });
 
 export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [stations, _setStations] = useState<IStation[]>([]);
+  const [stations, _setStations] = useState<{ [index: string]: IStation }>({});
   const [channels, _setChannels] = useState<{ [index: string]: IChannel }>({});
   const [event, _setEvents] = useState<IEvent | null>({
     depth: 1000,
@@ -54,17 +54,19 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         elevation: Number(st.elevation),
         long: Number(st.long),
         lat: Number(st.lat),
+        status: st.enabled ? "ENABLED" : "DISABLED",
       }));
-      _setStations(_stations);
+      const _stationsObj = _stations.reduce((acc, curr) => ((acc[curr.code] = curr), acc), {} as any);
+      _setStations(_stationsObj);
     }
     fetchStations();
   }, []);
 
   // update channels if stations changes
   useEffect(() => {
-    if (stations.length == 0) return;
+    if (Object.keys.length == 0) return;
     const _channels: Map<string, IChannel> = new Map();
-    stations.forEach((st) => {
+    Object.entries(stations).forEach(([_, st]) => {
       st.channels?.forEach((chan) => {
         _channels.set(`${st.code}_${chan.code}`, {
           ...chan,

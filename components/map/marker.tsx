@@ -4,13 +4,18 @@ import { Marker } from "react-map-gl";
 import { useRef, useMemo, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 
-export const Station: React.FC<IStation> = ({ code, elevation, lat, long, name, channels }) => {
+export const Station: React.FC<IStation> = (props) => {
+  const { code, elevation, lat, long, name, channels, status } = props;
   const markerRef = useRef<mapboxgl.Marker>(null);
 
   const popup = useMemo(() => {
     return new mapboxgl.Popup().setHTML(
       `
       <table>
+        <tr>
+          <td>Status</td>
+          <td>: ${status}</td>
+        </tr>
         <tr>
           <td>Kode</td>
           <td>: ${code}</td>
