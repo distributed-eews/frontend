@@ -26,7 +26,6 @@ export const MapGL: React.FC = () => {
     <Map
       {...viewState}
       minZoom={4}
-      maxZoom={5}
       mapboxAccessToken={MAPBOX_TOKEN}
       onMove={(evt) => setViewState(evt.viewState)}
       mapStyle="mapbox://styles/mapbox/satellite-v9"
