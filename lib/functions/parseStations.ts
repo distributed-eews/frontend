@@ -1,5 +1,18 @@
 import { IStation } from "../interfaces/stations";
-
+export const clearPacketsStations = (stations: { [index: string]: IStation })=>{
+  const copyStations = { ...stations };
+  for(const [key, station] of Object.entries(stations)){
+    copyStations[key]["status"] = station.status == "DISABLED" ? "DISABLED" : "ENABLED"
+    copyStations[key]["channels"] = station.channels.map(channel => ({
+      ...channel,
+      waveform:{
+        arrival: null,
+        data:[],
+      },
+    }))
+  }
+  return copyStations
+}
 export const parseStations = (res: any)=>{
     const _stations: IStation[] = (res.data as any[]).map((st) => ({
         code: st.code,

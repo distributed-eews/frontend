@@ -4,7 +4,7 @@ import { IPacket, IWaveform } from "../interfaces/waveform";
 import { IEvent } from "../interfaces/events";
 import { IChannel } from "../interfaces/channels";
 import { AxiosClient } from "../axios";
-import { parseStations } from "../functions/parseStations";
+import { clearPacketsStations, parseStations } from "../functions/parseStations";
 
 interface IEEWSContext {
   stations: { [index: string]: IStation }; // for control panels, and map markers
@@ -17,7 +17,6 @@ interface IEEWSContext {
 
 export const EEWSContext = createContext<IEEWSContext>({
   stations: {},
-  // channels: {},
   setChannelStatus: (waves) => {},
   setChannelsWaveform: (channels) => {},
   event: null,
@@ -26,6 +25,7 @@ export const EEWSContext = createContext<IEEWSContext>({
 
 export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [stations, _setStations] = useState<{ [index: string]: IStation }>({});
+
   const [event, _setEvents] = useState<IEvent | null>({
     depth: 1000,
     latitude: -3,
@@ -35,6 +35,13 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const setChannelStatus = () => {};
   const setChannelsWaveform = (key_station: string, key_channel: string, packet: IPacket) => {
+    if(key_station == "start"){
+      _setStations(clearPacketsStations(stations))
+      return
+    }
+    if(key_station == "stop"){
+      return
+    }
     const copyStations = { ...stations };
     const currentStations = copyStations[key_station];
     currentStations['status'] = "ACTIVE";
@@ -44,6 +51,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       chan_data = chan_data.slice(1, 10);
     }
     chan_data.push(packet);
+    currentChannels!['waveform']['data'] = chan_data
     _setStations(copyStations);
   };
   const setEvents = () => {};
