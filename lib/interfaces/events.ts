@@ -4,4 +4,5 @@ export interface IEvent {
   magnitude: number;
   latitude: number;
   longitude: number;
+  detectedAt: Date
 }

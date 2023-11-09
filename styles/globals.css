@@ -15,10 +15,10 @@
 td {
   vertical-align: top;
 }
-#control-stations td {
+.control-table td {
   vertical-align: center;
 }
-#control-stations td,
-#control-stations th {
+.control-table td,
+.control-table th {
   border: 1px solid black;
 }

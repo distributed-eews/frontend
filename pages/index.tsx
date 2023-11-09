@@ -4,24 +4,28 @@ import { MapGL } from "@/components/Map";
 import { Navbar } from "@/components/Navbar";
 import { StationCharts } from "@/components/Charts";
 import { useEffect, useState } from "react";
-import { onWaveformMessage } from "@/lib/functions/onWaveformMessage";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { ControlPanel } from "@/components/Panel";
+import { WSType, createWSConnection, setConnectionListener } from "@/lib/connection";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { setChannelsWaveform, stations } = useEEWS();
-  const [connection, setConnection] = useState<WebSocket>();
+  const [connections, setConnection] = useState<{ [index: string]: WebSocket }>({});
+  const { stations, setChannelsWaveform, packetsCount, setChannelPick, setEvents } = useEEWS();
   useEffect(() => {
-    if (!!connection || Object.entries(stations).length == 0) return;
-    const socket = new WebSocket(`ws://localhost:8080/ws`);
-    socket.onopen = () => {
-      console.log("Connect");
-    };
-    socket.onmessage = onWaveformMessage(setChannelsWaveform);
-    setConnection(socket);
-  }, [connection, setChannelsWaveform, stations]);
+    if (!Object.keys(connections).length && Object.entries(stations).length > 0 && !!packetsCount) {
+      // run this only once, and after stations has been fetched
+      let waveSocket = createWSConnection("/ws/waveform");
+      let pickSocket = createWSConnection("/ws/pick");
+      let eventSocket = createWSConnection("/ws/event");
+      setConnection({
+        [WSType.WAVEFORM]: setConnectionListener(WSType.WAVEFORM, waveSocket, setChannelsWaveform),
+        [WSType.PICK]: setConnectionListener(WSType.PICK, pickSocket, setChannelPick),
+        [WSType.EVENT]: setConnectionListener(WSType.EVENT, eventSocket, setEvents),
+      });
+    }
+  }, [connections, packetsCount, setChannelPick, setChannelsWaveform, setEvents, stations]);
 
   return (
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>

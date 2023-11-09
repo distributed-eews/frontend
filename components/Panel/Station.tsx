@@ -7,7 +7,7 @@ export const ControlStations = () => {
   const { stations } = useEEWS();
   return (
     <div id="control-stations" className="w-full overflow-y-auto">
-      <table className="table-auto relative border-collapse border-black border w-full">
+      <table className="control-table table-auto relative border-collapse border-black border w-full">
         <thead className="sticky top-0 left-0">
           <tr className="bg-white">
             <th>Station</th>
