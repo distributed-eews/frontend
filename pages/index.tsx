@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { ControlPanel } from "@/components/Panel";
 import { WSType, createWSConnection, setConnectionListener } from "@/lib/connection";
+import toast, { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,16 +32,16 @@ export default function Home() {
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>
       <Navbar />
       <div id="main-section" className="w-full">
+        <Toaster />
         <div id="map-control" className="w-full flex">
           <div id="map" className="border-2 border-black w-3/4 h-[60vh]">
             <MapGL />
           </div>
-          <div id="station-control" className="bg-yellow-300 w-1/4">
-            <h4>Panel</h4>
+          <div id="station-control" className="bg-indigo-50 w-1/4">
             <ControlPanel />
           </div>
         </div>
-        <div className="w-full min-h-screen bg-red-300">
+        <div className="w-full min-h-screen bg-indigo-50">
           <StationCharts />
         </div>
       </div>

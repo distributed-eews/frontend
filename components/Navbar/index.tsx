@@ -1,4 +1,4 @@
 export function Navbar() {
-  return <nav className="w-full h-20 bg-pink-300">Navbar</nav>;
+  return <nav className="w-full h-10 bg-indigo-950">Navbar</nav>;
 }
 

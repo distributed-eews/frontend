@@ -4,7 +4,7 @@ import { useEEWS } from "@/lib/hooks/useEEWS";
 import { useState } from "react";
 
 export const ControlMode = () => {
-  const {packetsCount} = useEEWS()
+  const {packetsCount, setLoading} = useEEWS()
   const [starttime, setStarttime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 60));
   const [endtime, setEndtime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 57));
 
@@ -19,12 +19,18 @@ export const ControlMode = () => {
         end_time: endtime,
       },
     });
+    if(res.status === 200) {
+      setLoading()
+    }
     console.log(res.status);
     console.log(res.data);
   };
   const onlive = async () => {
     const res = await AxiosClient.get("/api/live");
     console.log(res.status);
+    if(res.status === 200) {
+      setLoading()
+    }
     console.log(res.data);
   };
   return (

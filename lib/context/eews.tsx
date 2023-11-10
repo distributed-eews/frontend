@@ -7,6 +7,7 @@ import { AxiosClient } from "../axios";
 import { clearPacketsStations, parseStations } from "../functions/parseStations";
 import { WSType, createWSConnection, setConnectionListener } from "../connection";
 import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 interface IEEWSContext {
   stations: { [index: string]: IStation }; // for control panels, and map markers
@@ -16,6 +17,7 @@ interface IEEWSContext {
   event?: IEvent; // for map markers of earthquakes
   setEvents: (event: any) => void; // set data from websocket connection
   packetsCount?: number; // number of packets
+  setLoading : ()=>void
 }
 
 export const EEWSContext = createContext<IEEWSContext>({
@@ -23,6 +25,7 @@ export const EEWSContext = createContext<IEEWSContext>({
   setChannelPick: (waves) => {},
   setChannelsWaveform: (channels) => {},
   setEvents: (waves) => {},
+  setLoading: () => {},
 });
 
 interface IEEWSData {
@@ -37,7 +40,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [eewsData, setEewsData] = useState<IEEWSData>({
     stations: {},
   });
-
+  const [toastId, setToastId] = useState("")
   const setChannelPick = (station: string, channel: string, time: string) => {
     setEewsData((old) => {
       const copyStations = { ...old.stations };
@@ -54,6 +57,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setEewsData((old) => {
       if (!old.packetsCount) return old;
       if (key_station == "start") {
+        toast.dismiss(toastId)
         return {
           ...old,
           stations: clearPacketsStations(old.stations),
@@ -78,6 +82,10 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { ...old, stations: copyStations };
     });
   };
+
+  const setLoading = ()=>{
+    setToastId(toast.loading("Please wait..."));
+  }
 
   const setEvents = (data: any) => {
     console.log(data);
@@ -106,6 +114,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setChannelsWaveform: setChannelsWaveform,
         setEvents: setEvents,
         packetsCount: eewsData.packetsCount,
+        setLoading: setLoading
       }}
     >
       {children}
