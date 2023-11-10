@@ -11,21 +11,37 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
   const arr = channel.waveform.pick?.arrival;
   const nearest = arr ? waveforms.find((w) => w.time > arr) : null;
   return (
-    <div className="flex pr-10">
-      <div className="flex px-2 relative">
+    <div className="grid grid-cols-12">
+      <div className="col-span-1 px-2 relative items-center gap-x-2 grid grid-cols-2">
         <div className="flex flex-col h-full justify-center">
           <h6>{channel.stationCode}</h6>
           <div className="w-full border border-black"></div>
           <h6>{`[${channel.code}]`}</h6>
         </div>
-        <div className="absolute -right-1 translate-x-full top-0 z-10 h-full">
-          <p>{`amax:${max}`}</p>
-          <p>{`mean:${mean}`}</p>
-          <p>{`Arrival:${arr && new Date(arr).toLocaleTimeString()}`}</p>
-          {nearest && <p>{`nearest: ${new Date(nearest.time).toLocaleTimeString()}`}</p>}
+        <div className="text-xs relative">
+          <table className="absolute -translate-y-1/2">
+            <tr>
+              <td>Amax</td>
+              <td>{`:${max ?? "-"}`}</td>
+            </tr>
+            <tr>
+              <td>Mean</td>
+              <td>{`:${mean ?? "-"}`}</td>
+            </tr>
+            <tr>
+              <td>Arrival</td>
+              <td>
+                {`:${nearest && arr
+                  ? new Date(arr).toLocaleTimeString("en-US", {
+                      hourCycle: "h24",
+                    })
+                  : "-"}`}
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
-      <div className="w-full pt-4">
+      <div className="col-span-11 w-full pt-4">
         <ResponsiveContainer width="100%" className="" height={150}>
           <LineChart data={waveforms} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <XAxis

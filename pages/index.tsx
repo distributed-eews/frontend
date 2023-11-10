@@ -37,11 +37,11 @@ export default function Home() {
           <div id="map" className="border-2 border-black w-3/4 h-[60vh]">
             <MapGL />
           </div>
-          <div id="station-control" className="bg-indigo-50 w-1/4">
+          <div id="station-control" className="bg-indigo-100 w-1/4">
             <ControlPanel />
           </div>
         </div>
-        <div className="w-full min-h-screen bg-indigo-50">
+        <div className="w-full min-h-screen bg-indigo-100">
           <StationCharts />
         </div>
       </div>
