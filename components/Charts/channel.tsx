@@ -20,24 +20,28 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
         </div>
         <div className="text-xs relative">
           <table className="absolute -translate-y-1/2">
-            <tr>
-              <td>Amax</td>
-              <td>{`:${max ?? "-"}`}</td>
-            </tr>
-            <tr>
-              <td>Mean</td>
-              <td>{`:${mean ?? "-"}`}</td>
-            </tr>
-            <tr>
-              <td>Arrival</td>
-              <td>
-                {`:${nearest && arr
-                  ? new Date(arr).toLocaleTimeString("en-US", {
-                      hourCycle: "h24",
-                    })
-                  : "-"}`}
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>Amax</td>
+                <td>{`:${max ?? "-"}`}</td>
+              </tr>
+              <tr>
+                <td>Mean</td>
+                <td>{`:${mean ?? "-"}`}</td>
+              </tr>
+              <tr>
+                <td>Arrival</td>
+                <td>
+                  {`:${
+                    nearest && arr
+                      ? new Date(arr).toLocaleTimeString("en-US", {
+                          hourCycle: "h24",
+                        })
+                      : "-"
+                  }`}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>

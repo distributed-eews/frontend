@@ -1,12 +1,15 @@
 export interface IWaveform {
-  data: IPacket[]; // max 10 (1 minute)
+  data: IPacketWaveform[]; // max 10 (1 minute)
   pick: IPick | null;
 }
 interface IPick {
   arrival: number;
   arrivalDetected: number;
 }
-export interface IPacket {
+export interface IPacketBase {
+  type: 'start' | 'stop' | 'trace' | 'p' | 's';
+}
+export interface IPacketWaveform extends IPacketBase {
   // packet received from websocket server
   starttime: string | number;
   endtime: string | number;

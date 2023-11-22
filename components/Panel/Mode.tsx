@@ -6,7 +6,7 @@ import { useState } from "react";
 export const ControlMode = () => {
   const {packetsCount, setLoading} = useEEWS()
   const [starttime, setStarttime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 60));
-  const [endtime, setEndtime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 57));
+  const [endtime, setEndtime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 59 - 1000 * 30));
 
   const onSubmit = async () => {
     if (!starttime || !endtime || starttime.getTime() + 1000 * 10 * 60 < endtime.getTime()) {
@@ -19,8 +19,8 @@ export const ControlMode = () => {
         end_time: endtime,
       },
     });
+    console.log(res)
     if(res.status === 200) {
-      setLoading()
     }
     console.log(res.status);
     console.log(res.data);

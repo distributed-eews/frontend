@@ -1,38 +1,32 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import { IStation } from "../interfaces/stations";
-import { IPacket, IWaveform } from "../interfaces/waveform";
-import { IEvent } from "../interfaces/events";
+import { IPacketWaveform, IWaveform } from "../interfaces/waveform";
+import { ISEvent, IPEvent } from "../interfaces/events";
 import { IChannel } from "../interfaces/channels";
 import { AxiosClient } from "../axios";
 import { clearPacketsStations, parseStations } from "../functions/parseStations";
-import { WSType, createWSConnection, setConnectionListener } from "../connection";
 import { useRouter } from "next/router";
-import toast from "react-hot-toast";
 
 interface IEEWSContext {
   stations: { [index: string]: IStation }; // for control panels, and map markers
   // channels: { [index: string]: IChannel }; // to show waveforms data
-  setChannelsWaveform: (station: string, channel: string, packet: IPacket) => void; // update data from websocket connection
-  setChannelPick: (stations: string, channels: string, time: string) => void; // enable/disable channels
-  event?: IEvent; // for map markers of earthquakes
-  setEvents: (event: any) => void; // set data from websocket connection
+  websocketCallbacks: (message: MessageEvent<any>) => void; // set channel, set pick, and set event
+  event?: ISEvent; // for map markers of earthquakes
   packetsCount?: number; // number of packets
-  setLoading : ()=>void
+  setLoading: () => void;
 }
 
 export const EEWSContext = createContext<IEEWSContext>({
   stations: {},
-  setChannelPick: (waves) => {},
-  setChannelsWaveform: (channels) => {},
-  setEvents: (waves) => {},
   setLoading: () => {},
+  websocketCallbacks: () => {},
 });
 
 interface IEEWSData {
   stations: { [index: string]: IStation };
   packetsCount?: number;
   currentMode?: string;
-  event?: IEvent;
+  event?: ISEvent;
 }
 
 export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,9 +34,9 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [eewsData, setEewsData] = useState<IEEWSData>({
     stations: {},
   });
-  const [toastId, setToastId] = useState("")
-  const setChannelPick = (station: string, channel: string, time: string) => {
+  const setPEvent = (data: IPEvent) => {
     setEewsData((old) => {
+      const { channel, process_time, station, time } = data;
       const copyStations = { ...old.stations };
       const currChannel = copyStations[station].channels.find((chan) => chan.code == channel) as IChannel;
       currChannel["waveform"]["pick"] = {
@@ -53,43 +47,48 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { ...old, stations: copyStations };
     });
   };
-  const setChannelsWaveform = (key_station: string, key_channel: string, packet: IPacket) => {
-    setEewsData((old) => {
-      if (!old.packetsCount) return old;
-      if (key_station == "start") {
-        toast.dismiss(toastId)
-        return {
-          ...old,
-          stations: clearPacketsStations(old.stations),
-        };
-      }
-      if (key_station == "stop") {
-        return old;
-      }
+  const setChannelsWaveform = (data: IPacketWaveform)=>{
+    const { channel, station, type } = data;
+    const old = eewsData
+    if (!old.packetsCount) return;
+    if (type == "start") {
+      setEewsData({...old,stations: clearPacketsStations(old.stations) })
+      return
+    }
+    if (type == "stop") {
+      console.log("================================================")
+      return;
+    }
+    try {
       const copyStations = { ...old.stations };
-      const currentStations = copyStations[key_station];
+      const currentStations = copyStations[station];
       currentStations["status"] = "ACTIVE";
-      const currentChannels = currentStations.channels.find((chan) => chan.code == key_channel);
+      const currentChannels = currentStations.channels.find((chan) => chan.code == channel);
       let chan_data = currentChannels!.waveform.data;
       if (chan_data.length >= old.packetsCount) {
         chan_data = chan_data.slice(1, eewsData.packetsCount);
       }
-      chan_data.push({ ...packet, recvAt: new Date().getTime() });
+      chan_data.push({ ...data, recvAt: new Date().getTime() });
       currentChannels!["waveform"]["data"] = chan_data;
-      if (key_station == "BKB" && key_channel == "BHE") {
+      if (station == "BKB" && channel == "BHE") {
         console.log(currentChannels?.waveform);
       }
-      return { ...old, stations: copyStations };
-    });
-  };
+      setEewsData({...old, stations: copyStations})
+    } catch (error) {
+      console.error(data)
+      console.error(old)
+      console.error(error);
+    }
 
-  const setLoading = ()=>{
-    setToastId(toast.loading("Please wait..."));
   }
 
-  const setEvents = (data: any) => {
+  const setLoading = () => {
+    console.log("Loading...",)
+  };
+
+  const setSEvent = (data: any) => {
     console.log(data);
-    setEewsData((old) => ({ ...old, event: { ...data, detectedAt: new Date() } }));
+    // setEewsData((old) => ({ ...old, event: { ...data, detectedAt: new Date() } }));
   };
 
   useEffect(() => {
@@ -110,11 +109,23 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         stations: eewsData.stations,
         event: eewsData.event,
-        setChannelPick: setChannelPick,
-        setChannelsWaveform: setChannelsWaveform,
-        setEvents: setEvents,
         packetsCount: eewsData.packetsCount,
-        setLoading: setLoading
+        setLoading: setLoading,
+        websocketCallbacks: (message: MessageEvent<any>) => {
+          const res = JSON.parse(message.data);
+          const topic = res.topic;
+          const data = JSON.parse(res.value)
+          console.log(data)
+          if (topic == "p_arrival") {
+            setChannelsWaveform(data);
+          } else if (topic == "pick") {
+            if(data.type == "p"){
+              setPEvent(res.value)
+            }else if(data.type == "s"){
+              setSEvent(res.value)
+            }
+          }
+        },
       }}
     >
       {children}

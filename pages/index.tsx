@@ -6,27 +6,21 @@ import { StationCharts } from "@/components/Charts";
 import { useEffect, useState } from "react";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { ControlPanel } from "@/components/Panel";
-import { WSType, createWSConnection, setConnectionListener } from "@/lib/connection";
-import toast, { Toaster } from "react-hot-toast";
+import { createWSConnection } from "@/lib/connection";
+import  { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [connections, setConnection] = useState<{ [index: string]: WebSocket }>({});
-  const { stations, setChannelsWaveform, packetsCount, setChannelPick, setEvents } = useEEWS();
+  const [connection, setConnection] = useState<WebSocket>();
+  const { stations, packetsCount, websocketCallbacks } = useEEWS();
   useEffect(() => {
-    if (!Object.keys(connections).length && Object.entries(stations).length > 0 && !!packetsCount) {
-      // run this only once, and after stations has been fetched
-      let waveSocket = createWSConnection("/ws/waveform");
-      let pickSocket = createWSConnection("/ws/pick");
-      let eventSocket = createWSConnection("/ws/event");
-      setConnection({
-        [WSType.WAVEFORM]: setConnectionListener(WSType.WAVEFORM, waveSocket, setChannelsWaveform),
-        [WSType.PICK]: setConnectionListener(WSType.PICK, pickSocket, setChannelPick),
-        [WSType.EVENT]: setConnectionListener(WSType.EVENT, eventSocket, setEvents),
-      });
+    if (!connection && Object.entries(stations).length > 0 && !!packetsCount) {
+      console.log(stations)
+      const websocket = createWSConnection("/ws", websocketCallbacks)
+      setConnection(websocket);
     }
-  }, [connections, packetsCount, setChannelPick, setChannelsWaveform, setEvents, stations]);
+  }, [connection, packetsCount, stations, websocketCallbacks]);
 
   return (
     <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>

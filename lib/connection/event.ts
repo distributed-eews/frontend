@@ -1,4 +1,4 @@
-import { IPacket } from "../interfaces/waveform";
+import { IPacketWaveform } from "../interfaces/waveform";
 
 const onWaveformMessage = (setEvent: (data: any) => void) => {
   return (ev: MessageEvent<any>) => {
@@ -8,12 +8,3 @@ const onWaveformMessage = (setEvent: (data: any) => void) => {
     setEvent(parsedPacket);
   };
 };
-
-export const setEventConnectionListener = (socket: WebSocket, setEvent: (data: any) => void)=>{
-    socket.onmessage = onWaveformMessage(setEvent);
-    socket.onclose = (close)=>{
-        console.log(close.reason)
-        console.log(close)
-    }
-    return socket
-}

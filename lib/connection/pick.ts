@@ -1,4 +1,4 @@
-import { IPacket } from "../interfaces/waveform";
+import { IPacketWaveform } from "../interfaces/waveform";
 
 const onWaveformMessage = (setChannelPick: (stat: string, chan: string, time: string) => void) => {
   return (ev: MessageEvent<any>) => {
@@ -7,12 +7,3 @@ const onWaveformMessage = (setChannelPick: (stat: string, chan: string, time: st
     setChannelPick(parsedPacket.station, parsedPacket.channel, parsedPacket.arrival);
   };
 };
-
-export const setPickConnectionListener = (socket: WebSocket, setChannelPick: (stat: string, chan: string, time: string) => void)=>{
-    socket.onmessage = onWaveformMessage(setChannelPick);
-    socket.onclose = (close)=>{
-        console.log(close.reason)
-        console.log(close)
-    }
-    return socket
-}

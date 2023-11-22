@@ -1,6 +1,6 @@
-import { IPacket } from "../interfaces/waveform";
+import { IPacketWaveform } from "../interfaces/waveform";
 
-const onWaveformMessage = (setChannelsWaveform: (key: string, key2: string, packet: IPacket) => void) => {
+const onWaveformMessage = (setChannelsWaveform: (key: string, key2: string, packet: IPacketWaveform) => void) => {
   return (ev: MessageEvent<any>) => {
     const res = JSON.parse(ev.data);
     var parsedPacket = JSON.parse(res.value);
@@ -20,12 +20,3 @@ const onWaveformMessage = (setChannelsWaveform: (key: string, key2: string, pack
     setChannelsWaveform(parsedPacket.station, parsedPacket.channel, parsedPacket);
   };
 };
-
-export const setWaveformConnectionListener = (socket: WebSocket, setChannelsWaveform: (key: string, key2: string, packet: IPacket) => void)=>{
-    socket.onmessage = onWaveformMessage(setChannelsWaveform);
-    socket.onclose = (close)=>{
-        console.log(close.reason)
-        console.log(close)
-    }
-    return socket
-}

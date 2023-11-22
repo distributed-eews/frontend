@@ -1,7 +1,7 @@
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { IChannel } from "@/lib/interfaces/channels";
-import { IEvent } from "@/lib/interfaces/events";
 import { IStation } from "@/lib/interfaces/stations";
+import React from "react";
 
 export const ControlPickEvent = () => {
   return (
