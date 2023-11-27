@@ -1,4 +1,4 @@
-import { EEWSProvider } from "@/lib/context/eews";
+import { EEWSProvider } from "@/lib/hooks/eewsCtx";
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
@@ -9,8 +9,7 @@ export default function Document() {
           <Main />
           <NextScript />
         </body>
-      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020
-      </footer>
+
     </Html>
   );
 }

@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { EEWSContext } from "../context/eews";
+import { EEWSContext } from "./eewsCtx";
 
 export const useEEWS = () => {
   const context = useContext(EEWSContext);

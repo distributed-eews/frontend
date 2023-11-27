@@ -2,31 +2,32 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import { IStation } from "../interfaces/stations";
 import { IPacketWaveform, IWaveform } from "../interfaces/waveform";
 import { ISEvent, IPEvent } from "../interfaces/events";
-import { IChannel } from "../interfaces/channels";
 import { AxiosClient } from "../axios";
 import { clearPacketsStations, parseStations } from "../functions/parseStations";
 import { useRouter } from "next/router";
+import { IChannel } from "../interfaces/channels";
 
 interface IEEWSContext {
   stations: { [index: string]: IStation }; // for control panels, and map markers
-  // channels: { [index: string]: IChannel }; // to show waveforms data
   websocketCallbacks: (message: MessageEvent<any>) => void; // set channel, set pick, and set event
   event?: ISEvent; // for map markers of earthquakes
   packetsCount: number; // number of packets
   setLoading: () => void;
   setMinutes?: (m: number) => void;
+  group: string[];
+  setGroup?: (s: string[]) => void;
 }
 
 export const EEWSContext = createContext<IEEWSContext>({
   stations: {},
   setLoading: () => {},
   websocketCallbacks: () => {},
-  packetsCount : 50
+  packetsCount: 50,
+  group: [],
 });
 
 interface IEEWSData {
   stations: { [index: string]: IStation };
-  // packetsCount: number;
   currentMode?: string;
   event?: ISEvent;
 }
@@ -36,7 +37,8 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [eewsData, setEewsData] = useState<IEEWSData>({
     stations: {},
   });
-  const [packetsCount, setPacketsCount] = useState(50)
+  const [group, setGroup] = useState<string[]>([]);
+  const [packetsCount, setPacketsCount] = useState(50);
   const setPEvent = (data: IPEvent) => {
     const { p_arr, p_arr_time, station_code, s_arr } = data;
     if (p_arr && s_arr) {
@@ -102,13 +104,14 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await AxiosClient.get("/api/stations");
       const stations = parseStations(res);
       setEewsData((old) => ({ ...old, stations: stations }));
+      setGroup(["", ...Object.keys(stations).sort((a, b) => (a > b ? 1 : -1))]);
     }
     fetchStations();
   }, []);
 
-  const setMinutes = (m: number) =>{
-    setPacketsCount(m * 10)
-  }
+  const setMinutes = (m: number) => {
+    setPacketsCount(m * 10);
+  };
 
   return (
     <EEWSContext.Provider
@@ -116,6 +119,13 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         stations: eewsData.stations,
         event: eewsData.event,
         packetsCount: packetsCount,
+        group: group,
+        setGroup: (grs) => {
+          const ng = [...group].filter((x) => !!x && !grs.includes(x)).sort((a, b) => (a > b ? 1 : -1));
+          console.log(grs)
+          console.log([...grs, "", ...ng])
+          setGroup([...grs, "", ...ng]);
+        },
         setLoading: setLoading,
         setMinutes: setMinutes,
         websocketCallbacks: (message: MessageEvent<any>) => {

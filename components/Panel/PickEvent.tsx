@@ -6,12 +6,12 @@ import React from "react";
 export const ControlPickEvent = () => {
   return (
     <div className="w-full flex flex-col gap-y-4">
-      <div className="flex flex-col justify-between w-full border-2 border-red-500">
-        <h4 className="font-bold">Pick (P Arrival)</h4>
+      <div className="flex flex-col justify-between w-full rounded bg-slate-100 p-2">
+        <h4 className="font-semibold text-base">Pick (P Arrival)</h4>
         <ControlPickTable />
       </div>
-      <div className="flex flex-col justify-between w-full border-2 border-red-500">
-        <h4 className="font-bold">Event (Earthquake)</h4>
+      <div className="flex flex-col justify-between w-full rounded bg-slate-100 p-2">
+        <h4 className="font-semibold text-base">Event (Earthquake)</h4>
         <ControlEvent />
       </div>
     </div>
@@ -20,7 +20,7 @@ export const ControlPickEvent = () => {
 const ControlEvent = () => {
   const { event } = useEEWS();
   return (
-    <table className="control-table table-fixed relative border-collapse border-black border w-full">
+    <table className="table-fixed relative border-collapse w-full">
       <tr>
         <td>Tanggal</td>
         <td>: {event ? new Date(event.time).toLocaleDateString() : "-"}</td>

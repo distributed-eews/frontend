@@ -17,7 +17,7 @@ const ControlLastPacket = () => {
   return (
     <div className="w-full overflow-y-auto">
       <h4 className="font-bold">Last Packet</h4>
-      <table className="control-table table-auto text-xs relative border-collapse border-black border w-full">
+      <table className="control-table table-auto text-[8px] relative border-collapse border-black border w-full">
         <thead className="sticky top-0 left-0">
           <tr className="bg-white">
             <th>Stn</th>

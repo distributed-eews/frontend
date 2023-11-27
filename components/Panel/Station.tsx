@@ -4,7 +4,7 @@ import { IStation } from "@/lib/interfaces/stations";
 import { useRouter } from "next/router";
 
 export const ControlStations = () => {
-  const { stations } = useEEWS();
+  const { stations, group } = useEEWS();
   return (
     <div id="control-stations" className="w-full overflow-y-auto">
       <table className="control-table table-auto relative border-collapse border-black border w-full">
@@ -16,11 +16,9 @@ export const ControlStations = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.keys(stations)
-            .sort((a, b) => (a > b ? 1 : -1))
-            .map((key) => (
-              <ControlStation key={`control-station-${key}`} {...stations[key]} />
-            ))}
+          {group.filter(f=>!!f).map((key) => (
+            <ControlStation key={`control-station-${key}`} {...stations[key]} />
+          ))}
         </tbody>
       </table>
     </div>
@@ -40,7 +38,7 @@ const ControlStation = (station: IStation) => {
     const element = document.getElementById(station.code);
     console.log(element);
     if (element) {
-      element.scrollIntoView({ behavior: "instant", block: "center" });
+      element.scrollIntoView({ behavior: "instant", block: "end" });
     }
   };
   return (
@@ -48,15 +46,22 @@ const ControlStation = (station: IStation) => {
       {station.channels.map((chan, idx) => (
         <tr key={`control-station-channel-${station.code}-${chan.code}-${idx}`}>
           {idx == 0 && (
-            <td className="" rowSpan={station.channels.length}>
-              <div className={`text-blue-700 py-4 flex justify-center items-center text-center underline ${station.status == 'ACTIVE' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={scrollToElement}>{station.code}</div>
+            <td
+              onClick={scrollToElement}
+              className={` ${station.status == "ACTIVE" ? "cursor-pointer" : "cursor-not-allowed"}`}
+              style={{ verticalAlign: "middle" }}
+              rowSpan={station.channels.length}
+            >
+              <div className={`text-blue-700 flex justify-center items-center text-center underline`}>
+                {station.code}
+              </div>
             </td>
           )}
           <td>{`${chan.code} [${
             station.status == "DISABLED" ? "disabled" : chan.waveform.data.length == 0 ? "enabled" : "active"
           }]`}</td>
           {idx == 0 && (
-            <td rowSpan={station.channels.length}>
+            <td style={{ verticalAlign: "middle" }} rowSpan={station.channels.length}>
               {station.status == "DISABLED" ? (
                 <button className="p-2 bg-green-400 text-white rounded" onClick={toggle}>
                   Enable

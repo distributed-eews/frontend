@@ -3,13 +3,16 @@ import { toiso } from "@/lib/functions/toiso";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Select from "react-select";
 
 export const ControlMode = () => {
   const { setLoading } = useEEWS();
-  const [starttime, setStarttime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 60));
-  const [endtime, setEndtime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 59 - 1000 * 30));
+  const [starttime, setStarttime] = useState<Date>();
+  const [endtime, setEndtime] = useState<Date>();
   const [mode, setMode] = useState<"PLAYBACK" | "LIVE">("PLAYBACK");
   const onSubmit = async () => {
+    console.log(starttime)
+    console.log(endtime)
     if (!starttime || !endtime || starttime.getTime() + 1000 * 30 * 60 < endtime.getTime()) {
       alert("Isi starttime, endtime, dan pastikan endtime tidak lebih besar dari 30 menit");
       return;
@@ -41,7 +44,9 @@ export const ControlMode = () => {
   const active = "bg-indigo-950 ";
   return (
     <div className="w-full flex flex-col gap-y-4">
-      <div className="flex flex-col w-full rounded bg-slate-100 gap-y-2 p-2">
+      <Settings />
+      <div className="flex flex-col w-full rounded bg-slate-100 p-2">
+        <h4 className="font-semibold text-base">Pemutaran Data</h4>
         <div className="rounded bg-indigo-800 grid grid-cols-2 font-semibold">
           <div
             onClick={() => setMode("PLAYBACK")}
@@ -71,7 +76,7 @@ export const ControlMode = () => {
                 id="starttime"
                 type="datetime-local"
                 onChange={(e) => setStarttime(new Date(e.target.value))}
-                value={toiso(starttime)}
+                // defaultValue={toiso(starttime)}
               ></input>
             </div>
             <label htmlFor="endtime">Waktu Selesai (+7)</label>
@@ -82,7 +87,7 @@ export const ControlMode = () => {
                 id="endtime"
                 type="datetime-local"
                 onChange={(e) => setEndtime(new Date(e.target.value))}
-                value={toiso(endtime)}
+                // defaultValue={toiso(endtime)}
               ></input>
             </div>
             <div className="col-span-2 flex flex-row-reverse pt-2">
@@ -113,22 +118,22 @@ export const ControlMode = () => {
           </div>
         )}
       </div>
-      <Settings />
     </div>
   );
 };
 
 const Settings = () => {
-  const { packetsCount, setMinutes } = useEEWS();
+  const { packetsCount, setMinutes, stations, setGroup, group } = useEEWS();
   const [m, sm] = useState(packetsCount / 10);
+  const [grs, setgrs] = useState<string[]>([]);
   return (
     <div className="flex flex-col w-full rounded bg-slate-100 gap-y-2 p-2">
       <h4 className="font-semibold text-base">Pengaturan</h4>
       <table className="table">
         <tbody>
           <tr>
-            <td>
-              <label htmlFor="minutes">Durasi Trace</label>
+            <td style={{ verticalAlign: "middle" }}>
+              <label htmlFor="minutes">Trace</label>
             </td>
             <td className="">
               <span>: </span>
@@ -145,12 +150,40 @@ const Settings = () => {
               <span> (menit)</span>
             </td>
           </tr>
+          <tr>
+            <td style={{ verticalAlign: "middle" }}>Group</td>
+            <td>
+              <Select
+                isMulti
+                name="colors"
+                id="select-group-control"
+                instanceId={"select-group-control"}
+                options={group.map((key) => ({
+                  value: key,
+                  label: key,
+                }))}
+                defaultValue={group
+                  .slice(
+                    0,
+                    group.findIndex((i) => !i)
+                  )
+                  .map((key) => ({
+                    value: key,
+                    label: key,
+                  }))}
+                onChange={(e) => setgrs(e.map((x) => x.value))}
+                className="basic-multi-select"
+                classNamePrefix="select"
+              />
+            </td>
+          </tr>
         </tbody>
       </table>
       <div className="flex gap-x-2">
         <button
           onClick={() => {
-            setMinutes && setMinutes(m)
+            setMinutes && setMinutes(m);
+            setGroup && setGroup(grs);
           }}
           className="px-2 py-1 font-bold text-white bg-indigo-900 rounded-xl hover:bg-indigo-700 cursor-pointer"
         >

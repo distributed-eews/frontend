@@ -8,13 +8,15 @@ const LineChart = dynamic(() => import("recharts").then((recharts) => recharts.L
 
 export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
   const {packetsCount} = useEEWS()
+  if(channel.waveform.data.length == 0){
+    return <div></div>
+  }
   const waveforms = setWaveformTimeFromChannel(channel, packetsCount);
   const [mean, max] = getWaveformStats(waveforms);
   const arr = channel.waveform.pick?.arrival;
   const nearest = arr ? waveforms.find((w) => w.time > arr) : null;
-  const id = channel.code == "BHE" ? channel.stationCode : channel.stationCode+channel.code
   return (
-    <div className="grid grid-cols-12" id={id} >
+    <div className="grid grid-cols-12" >
       <div className="col-span-1 px-2 relative items-center gap-x-2 grid grid-cols-2">
         <div className="flex flex-col h-full justify-center">
           <h6>{channel.stationCode}</h6>
@@ -74,7 +76,7 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
               type="number"
               domain={([dataMin, dataMax]) => {
                 const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax));
-                return [-absMax, absMax];
+                return [-absMax-5000, absMax+5000];
               }}
               ticks={[0]}
             />

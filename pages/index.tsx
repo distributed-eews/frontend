@@ -31,14 +31,16 @@ export default function Home() {
           <div id="map" className=" w-3/4 h-[45vh]">
             <MapGL />
           </div>
-          <div id="station-control" className="bg-indigo-100 w-1/4">
+          <div id="station-control" className="bg-indigo-100  h-[45vh] w-1/4">
             <ControlPanel />
           </div>
         </div>
-        <div className="w-full min-h-screen bg-indigo-100">
+        <div className="w-full min-h-[40vh] bg-indigo-100">
           <StationCharts />
         </div>
       </div>
+      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020
+      </footer>
     </main>
   );
 }

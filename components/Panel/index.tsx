@@ -11,7 +11,7 @@ export const ControlPanel = () => {
   const { stations } = useEEWS();
   const [currentTab, setTab] = useState<PanelTab>("PLAYER");
   return (
-    <div className="w-full text-sm">
+    <div className="w-full text-sm overflow-y-hidden h-full">
       <div className="grid grid-cols-4 gap-0 w-full">
         {["PLAYER", "STATIONS", "ARRIVAL", "STATISTICS"].map((tab, idx) => (
           <div
@@ -23,7 +23,7 @@ export const ControlPanel = () => {
           </div>
         ))}
       </div>
-      <div className="p-4 flex flex-col overflow-auto max-h-[40vh] border-4">
+      <div className="p-4 flex flex-col overflow-auto max-h-full pb-10 border-4">
         {currentTab == "STATIONS" && <ControlStations />}
         {currentTab == "PLAYER" && <ControlMode />}
         {currentTab == "ARRIVAL" && <ControlPickEvent/>}
