@@ -72,8 +72,8 @@ export const ControlMode = () => {
       <div className="flex justify-between w-full border-2 border-red-500">
         <form action="" method="get" className="">
           <div className="flex gap-x-2">
-            <label htmlFor="packets">Jumlah Packets dalam Chart</label>
-            <input id="packets" defaultValue={packetsCount} type="number" min={3} max={100} name="packets" />
+            <label htmlFor="minutes">Panjang Line Chart (menit)</label>
+            <input id="minutes" defaultValue={packetsCount ? packetsCount / 10 : 5} type="number" min={3} max={1000} name="minutes" />
           </div>
           <button className="px-2 py-1 mx-auto font-bold text-white bg-red-700 rounded-xl hover:bg-red-500">Ubah!</button>
         </form>

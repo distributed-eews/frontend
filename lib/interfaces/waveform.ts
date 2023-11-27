@@ -7,7 +7,7 @@ interface IPick {
   arrivalDetected: number;
 }
 export interface IPacketBase {
-  type: 'start' | 'stop' | 'trace' | 'p' | 's';
+  type: 'start' | 'stop' | 'trace' | 'ps' | 'params';
 }
 export interface IPacketWaveform extends IPacketBase {
   // packet received from websocket server

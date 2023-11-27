@@ -35,28 +35,30 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     stations: {},
   });
   const setPEvent = (data: IPEvent) => {
-    setEewsData((old) => {
-      const { channel, process_time, station, time } = data;
-      const copyStations = { ...old.stations };
-      const currChannel = copyStations[station].channels.find((chan) => chan.code == channel) as IChannel;
-      currChannel["waveform"]["pick"] = {
-        arrival: new Date(time).getTime(),
-        arrivalDetected: new Date().getTime(),
-      };
-      console.log("channel pick: ", currChannel);
-      return { ...old, stations: copyStations };
-    });
+    const { p_arr, p_arr_time, station_code, s_arr } = data;
+    if (p_arr && s_arr) {
+      const copyStations = { ...eewsData.stations };
+      copyStations[station_code].channels.forEach((chan) => {
+        chan["waveform"]["pick"] = {
+          arrival: new Date(p_arr_time).getTime(),
+          arrivalDetected: new Date().getTime(),
+        };
+      });
+      console.log("channel pick: ", copyStations[station_code]);
+      setEewsData({ ...eewsData, stations: copyStations });
+    }
   };
-  const setChannelsWaveform = (data: IPacketWaveform)=>{
+
+  const setChannelsWaveform = (data: IPacketWaveform) => {
     const { channel, station, type } = data;
-    const old = eewsData
+    const old = eewsData;
     if (!old.packetsCount) return;
     if (type == "start") {
-      setEewsData({...old,stations: clearPacketsStations(old.stations) })
-      return
+      setEewsData({ ...old, stations: clearPacketsStations(old.stations) });
+      return;
     }
     if (type == "stop") {
-      console.log("================================================")
+      console.log("================================================");
       return;
     }
     try {
@@ -73,22 +75,24 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (station == "BKB" && channel == "BHE") {
         console.log(currentChannels?.waveform);
       }
-      setEewsData({...old, stations: copyStations})
+      setEewsData({ ...old, stations: copyStations });
     } catch (error) {
-      console.error(data)
-      console.error(old)
+      console.error(data);
+      console.error(old);
       console.error(error);
     }
-
-  }
-
-  const setLoading = () => {
-    console.log("Loading...",)
   };
 
-  const setSEvent = (data: any) => {
+  const setLoading = () => {
+    console.log("Loading...");
+  };
+
+  const setParams = (data: ISEvent) => {
     console.log(data);
-    // setEewsData((old) => ({ ...old, event: { ...data, detectedAt: new Date() } }));
+    setEewsData({
+      ...eewsData,
+      event: data,
+    });
   };
 
   useEffect(() => {
@@ -101,7 +105,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    setEewsData((old) => ({ ...old, packetsCount: Number(router.query.packets ?? 10) }));
+    setEewsData((old) => ({ ...old, packetsCount: Number(router.query.minutes ?? 5) * 10 }));
   }, [router]);
 
   return (
@@ -114,15 +118,20 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         websocketCallbacks: (message: MessageEvent<any>) => {
           const res = JSON.parse(message.data);
           const topic = res.topic;
-          const data = JSON.parse(res.value)
-          console.log(data)
+          const data = JSON.parse(res.value);
+          console.log(data);
           if (topic == "p_arrival") {
             setChannelsWaveform(data);
           } else if (topic == "pick") {
-            if(data.type == "p"){
-              setPEvent(res.value)
-            }else if(data.type == "s"){
-              setSEvent(res.value)
+            if (data.type == "ps") {
+              setPEvent({
+                ...res.value,
+              });
+            } else if (data.type == "params") {
+              setParams({
+                ...res.value,
+                detectedAt: new Date(),
+              });
             }
           }
         },
