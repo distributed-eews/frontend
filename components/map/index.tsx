@@ -14,7 +14,7 @@ export const MapGL: React.FC = () => {
   const [viewState, setViewState] = React.useState({
     longitude: 117,
     latitude: -3,
-    zoom: 4.3,
+    zoom: 3.8,
   });
   const { stations, event } = useEEWS();
 
@@ -25,7 +25,7 @@ export const MapGL: React.FC = () => {
   return (
     <Map
       {...viewState}
-      minZoom={4}
+      minZoom={3.8}
       mapboxAccessToken={MAPBOX_TOKEN}
       onMove={(evt) => setViewState(evt.viewState)}
       mapStyle="mapbox://styles/mapbox/satellite-v9"

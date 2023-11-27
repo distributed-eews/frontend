@@ -15,16 +15,18 @@ export const StationCharts = () => {
   channels.sort((a, b) => (`${a.stationCode}${a.code}` > `${b.stationCode}${b.code}` ? 1 : -1));
   return (
     <div className="max-h-screen w-full border-4 border-black p-4 overflow-auto">
-      {channels.filter(chan=>chan.waveform.data.length > 0).map((chan, idx) => (
-        <RenderIfVisible key={`${chan.stationCode}${chan.code}${idx}`} defaultHeight={100} visibleOffset={100}>
-          <ChannelChart channel={chan} />
-        </RenderIfVisible>
-      ))}
-      {channels.filter(chan=>chan.waveform.data.length == 0).map((chan, idx) => (
-        <RenderIfVisible key={`empty${chan.stationCode}${chan.code}${idx}`} defaultHeight={100} visibleOffset={100}>
-          <ChannelChart channel={chan} />
-        </RenderIfVisible>
-      ))}
+      {channels
+        .filter((chan) => chan.waveform.data.length > 0)
+        .map((chan, idx) => {
+          const id = chan.code == "BHE" ? chan.stationCode : chan.stationCode+chan.code
+          return (
+            <div id={id} key={`${chan.stationCode}${chan.code}${idx}`}>
+              <RenderIfVisible defaultHeight={100} visibleOffset={50}>
+                <ChannelChart channel={chan} />
+              </RenderIfVisible>
+            </div>
+          );
+        })}
     </div>
   );
 };

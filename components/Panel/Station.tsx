@@ -36,11 +36,22 @@ const ControlStation = (station: IStation) => {
       router.reload();
     }
   };
+  const scrollToElement = () => {
+    const element = document.getElementById(station.code);
+    console.log(element);
+    if (element) {
+      element.scrollIntoView({ behavior: "instant", block: "center" });
+    }
+  };
   return (
     <>
       {station.channels.map((chan, idx) => (
         <tr key={`control-station-channel-${station.code}-${chan.code}-${idx}`}>
-          {idx == 0 && <td rowSpan={station.channels.length}>{station.code}</td>}
+          {idx == 0 && (
+            <td className="" rowSpan={station.channels.length}>
+              <div className={`text-blue-700 py-4 flex justify-center items-center text-center underline ${station.status == 'ACTIVE' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={scrollToElement}>{station.code}</div>
+            </td>
+          )}
           <td>{`${chan.code} [${
             station.status == "DISABLED" ? "disabled" : chan.waveform.data.length == 0 ? "enabled" : "active"
           }]`}</td>

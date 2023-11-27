@@ -9,7 +9,8 @@ export default function Document() {
           <Main />
           <NextScript />
         </body>
-      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020</footer>
+      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020
+      </footer>
     </Html>
   );
 }

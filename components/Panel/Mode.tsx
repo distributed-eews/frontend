@@ -1,16 +1,17 @@
 import { AxiosClient } from "@/lib/axios";
 import { toiso } from "@/lib/functions/toiso";
 import { useEEWS } from "@/lib/hooks/useEEWS";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 export const ControlMode = () => {
-  const { packetsCount, setLoading } = useEEWS();
+  const { setLoading } = useEEWS();
   const [starttime, setStarttime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 60));
   const [endtime, setEndtime] = useState<Date>(new Date(new Date().getTime() - 1000 * 60 * 59 - 1000 * 30));
-
+  const [mode, setMode] = useState<"PLAYBACK" | "LIVE">("PLAYBACK");
   const onSubmit = async () => {
-    if (!starttime || !endtime || starttime.getTime() + 1000 * 10 * 60 < endtime.getTime()) {
-      alert("Isi starttime, endtime, dan pastikan endtime tidak lebih besar dari 10 menit");
+    if (!starttime || !endtime || starttime.getTime() + 1000 * 30 * 60 < endtime.getTime()) {
+      alert("Isi starttime, endtime, dan pastikan endtime tidak lebih besar dari 30 menit");
       return;
     }
     const res = await AxiosClient.get("/api/playback", {
@@ -37,67 +38,124 @@ export const ControlMode = () => {
     const res = await AxiosClient.post("/api/stop");
     console.log(res.status);
   };
+  const active = "bg-indigo-950 ";
   return (
     <div className="w-full flex flex-col gap-y-4">
-      <div className="flex flex-col w-full border-2 border-red-500 gap-y-2">
-        <div>
-          <h4 className="font-bold">Playback Mode:</h4>
-          <label htmlFor="starttime">Start Time</label>
-          <input
-            name="starttime"
-            id="starttime"
-            type="datetime-local"
-            onChange={(e) => setStarttime(new Date(e.target.value))}
-            value={toiso(starttime)}
-          ></input>
-        </div>
-        <div>
-          <label htmlFor="endtime">End Time</label>
-          <input
-            name="endtime"
-            id="endtime"
-            type="datetime-local"
-            onChange={(e) => setEndtime(new Date(e.target.value))}
-            value={toiso(endtime)}
-          ></input>
-        </div>
-        <div className="w-full flex justify-center">
-          <button onClick={onSubmit} className="px-2 py-1 font-bold text-white bg-red-700 rounded-xl hover:bg-red-500">
-            Playback!
-          </button>
-        </div>
-      </div>
-      <div className="flex justify-between items-center w-full border-2 border-red-500">
-        <h4 className="font-bold">Live Mode:</h4>
-        <div>
-          <button onClick={onlive} className="px-2 py-1 font-bold text-white bg-red-700 rounded-xl hover:bg-red-500">
-            Start!
-          </button>
-          <button
-            onClick={onStoplive}
-            className="px-2 py-1 font-bold text-white bg-red-700 rounded-xl hover:bg-red-500"
+      <div className="flex flex-col w-full rounded bg-slate-100 gap-y-2 p-2">
+        <div className="rounded bg-indigo-800 grid grid-cols-2 font-semibold">
+          <div
+            onClick={() => setMode("PLAYBACK")}
+            className={`text-center text-white cursor-pointer p-1 rounded ${
+              mode == "PLAYBACK" && active
+            } hover:bg-indigo-900`}
           >
-            Stop!
-          </button>
-        </div>
-      </div>
-      <div className="flex justify-between w-full border-2 border-red-500">
-        <form action="" method="get" className="">
-          <div className="flex gap-x-2">
-            <label htmlFor="minutes">Panjang Line Chart (menit)</label>
-            <input
-              id="minutes"
-              defaultValue={packetsCount ? packetsCount / 10 : 5}
-              type="number"
-              min={3}
-              max={1000}
-              name="minutes"
-            />
+            PlayBack
           </div>
-          <button className="px-2 py-1 mx-auto font-bold text-white bg-red-700 rounded-xl hover:bg-red-500">
-            Ubah!
-          </button>
-        </form>
+          <div
+            onClick={() => setMode("LIVE")}
+            className={`text-center text-white cursor-pointer p-1 rounded ${
+              mode == "LIVE" && active
+            } hover:bg-indigo-900`}
+          >
+            Live
+          </div>
+        </div>
+        {mode == "PLAYBACK" && (
+          <div className="grid grid-cols-2 gap-y-2">
+            <p className="col-span-2 text-center font-medium underline">Data PlayBack dari FDSN GEOFON</p>
+            <label htmlFor="starttime">Waktu Mulai (+7)</label>
+            <div className="flex">
+              <p>:</p>
+              <input
+                name="starttime"
+                id="starttime"
+                type="datetime-local"
+                onChange={(e) => setStarttime(new Date(e.target.value))}
+                value={toiso(starttime)}
+              ></input>
+            </div>
+            <label htmlFor="endtime">Waktu Selesai (+7)</label>
+            <div className="flex">
+              <p>:</p>
+              <input
+                name="endtime"
+                id="endtime"
+                type="datetime-local"
+                onChange={(e) => setEndtime(new Date(e.target.value))}
+                value={toiso(endtime)}
+              ></input>
+            </div>
+            <div className="col-span-2 flex flex-row-reverse pt-2">
+              <button
+                onClick={onSubmit}
+                className="px-2 py-1 font-bold text-white bg-indigo-900 rounded-xl hover:bg-indigo-700 cursor-pointer"
+              >
+                Start!
+              </button>
+            </div>
+          </div>
+        )}
+        {mode == "LIVE" && (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <p className="col-span-2 text-center font-medium underline">Data Terbaru dari Seedlink GEOFON</p>
+            <button
+              onClick={onlive}
+              className="w-auto px-2 py-1 font-bold text-white bg-indigo-800 rounded-xl hover:bg-indigo-950"
+            >
+              Start!
+            </button>
+            <button
+              onClick={onStoplive}
+              className="px-2 py-1 font-bold text-white bg-indigo-800 rounded-xl hover:bg-indigo-950"
+            >
+              Stop!
+            </button>
+          </div>
+        )}
+      </div>
+      <Settings />
+    </div>
+  );
+};
+
+const Settings = () => {
+  const { packetsCount, setMinutes } = useEEWS();
+  const [m, sm] = useState(packetsCount / 10);
+  return (
+    <div className="flex flex-col w-full rounded bg-slate-100 gap-y-2 p-2">
+      <h4 className="font-semibold text-base">Pengaturan</h4>
+      <table className="table">
+        <tbody>
+          <tr>
+            <td>
+              <label htmlFor="minutes">Durasi Trace</label>
+            </td>
+            <td className="">
+              <span>: </span>
+              <input
+                className="w-20"
+                id="minutes"
+                value={Number(m)}
+                onChange={(e) => sm(Number(e.target.value))}
+                type="number"
+                min={1}
+                max={30}
+                name="minutes"
+              />
+              <span> (menit)</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div className="flex gap-x-2">
+        <button
+          onClick={() => {
+            setMinutes && setMinutes(m)
+          }}
+          className="px-2 py-1 font-bold text-white bg-indigo-900 rounded-xl hover:bg-indigo-700 cursor-pointer"
+        >
+          ubah!
+        </button>
       </div>
     </div>
   );

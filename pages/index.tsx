@@ -27,8 +27,8 @@ export default function Home() {
       <Navbar />
       <div id="main-section" className="w-full">
         <Toaster />
-        <div id="map-control" className="w-full flex">
-          <div id="map" className="border-2 border-black w-3/4 h-[60vh]">
+        <div id="map-control" className="w-full flex sticky top-0 z-20 border-2 border-indigo-950">
+          <div id="map" className=" w-3/4 h-[45vh]">
             <MapGL />
           </div>
           <div id="station-control" className="bg-indigo-100 w-1/4">

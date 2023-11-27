@@ -12,8 +12,9 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
   const [mean, max] = getWaveformStats(waveforms);
   const arr = channel.waveform.pick?.arrival;
   const nearest = arr ? waveforms.find((w) => w.time > arr) : null;
+  const id = channel.code == "BHE" ? channel.stationCode : channel.stationCode+channel.code
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12" id={id} >
       <div className="col-span-1 px-2 relative items-center gap-x-2 grid grid-cols-2">
         <div className="flex flex-col h-full justify-center">
           <h6>{channel.stationCode}</h6>
@@ -48,7 +49,7 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
         </div>
       </div>
       <div className="col-span-11 w-full pt-4">
-        <ResponsiveContainer width="100%" className="" height={150}>
+        <ResponsiveContainer width="100%" className="" height={100}>
           <LineChart data={waveforms} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <XAxis
               dataKey="time"
