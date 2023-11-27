@@ -3,10 +3,12 @@ import dynamic from "next/dynamic";
 import { IChannel } from "@/lib/interfaces/channels";
 import { setWaveformTimeFromChannel } from "@/lib/functions/setWaveformTimeFromChannel";
 import { getWaveformStats } from "@/lib/functions/getWaveformStats";
+import { useEEWS } from "@/lib/hooks/useEEWS";
 const LineChart = dynamic(() => import("recharts").then((recharts) => recharts.LineChart), { ssr: false });
 
 export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
-  const waveforms = setWaveformTimeFromChannel(channel);
+  const {packetsCount} = useEEWS()
+  const waveforms = setWaveformTimeFromChannel(channel, packetsCount);
   const [mean, max] = getWaveformStats(waveforms);
   const arr = channel.waveform.pick?.arrival;
   const nearest = arr ? waveforms.find((w) => w.time > arr) : null;
@@ -53,7 +55,7 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
               xAxisId={0}
               axisLine={true}
               tickSize={10}
-              interval={Math.floor(waveforms.length / 4) - 10}
+              interval={Math.floor(waveforms.length / 9) - 10}
               domain={["auto", "auto"]}
               padding={"gap"}
               tickFormatter={(val) =>

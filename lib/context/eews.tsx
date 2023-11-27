@@ -105,7 +105,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    setEewsData((old) => ({ ...old, packetsCount: Number(router.query.minutes ?? 5) * 10 }));
+    setEewsData((old) => ({ ...old, packetsCount: Number(router.query.minutes ?? 3) * 10 }));
   }, [router]);
 
   return (
