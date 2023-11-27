@@ -34,7 +34,7 @@ export const ControlMode = () => {
     console.log(res.data);
   };
   const onStoplive = async () => {
-    const res = await AxiosClient.get("/api/idle");
+    const res = await AxiosClient.post("/api/stop");
     console.log(res.status);
   };
   return (
