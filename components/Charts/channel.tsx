@@ -75,8 +75,8 @@ export const ChannelChart: React.FC<{ channel: IChannel }> = ({ channel }) => {
             <YAxis
               type="number"
               domain={([dataMin, dataMax]) => {
-                const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax));
-                return [-absMax-5000, absMax+5000];
+                const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax), 5000);
+                return [-absMax, absMax];
               }}
               ticks={[0]}
             />

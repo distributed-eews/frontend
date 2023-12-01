@@ -93,6 +93,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setParams = (data: ISEvent) => {
     console.log(data);
+    console.log(data.magnitude)
     setEewsData({
       ...eewsData,
       event: data,
@@ -122,8 +123,8 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         group: group,
         setGroup: (grs) => {
           const ng = [...group].filter((x) => !!x && !grs.includes(x)).sort((a, b) => (a > b ? 1 : -1));
-          console.log(grs)
-          console.log([...grs, "", ...ng])
+          console.log(grs);
+          console.log([...grs, "", ...ng]);
           setGroup([...grs, "", ...ng]);
         },
         setLoading: setLoading,
@@ -132,18 +133,33 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const res = JSON.parse(message.data);
           const topic = res.topic;
           const data = JSON.parse(res.value);
-          // console.log(data);
           if (topic == "p_arrival") {
             setChannelsWaveform(data);
-          } else if (topic == "pick") {
+          } else {
+            console.log(data);
             if (data.type == "ps") {
+              console.log(data);
               setPEvent({
-                ...res.value,
+                p_arr: data.p_arr,
+                p_arr_time: data.p_arr_time+"+00",
+                s_arr: data.s_arr,
+                s_arr_time: data.s_arr_time+"+00",
+                station_code: data.station_code,
+                type: data.type,
               });
             } else if (data.type == "params") {
+              console.log(data);
+              console.log(typeof data)
+              console.log(data.time)
               setParams({
-                ...res.value,
                 detectedAt: new Date(),
+                depth: data.depth,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                magnitude: data.magnitude,
+                station_codes: data.station_codes,
+                time: data+"+00",
+                type: data.type,
               });
             }
           }
