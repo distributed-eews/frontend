@@ -7,19 +7,35 @@ import { useEffect, useState } from "react";
 import { useEEWS } from "@/lib/hooks/useEEWS";
 import { ControlPanel } from "@/components/Panel";
 import { createWSConnection } from "@/lib/connection";
-import  { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import { EEWSProvider } from "@/lib/hooks/eewsCtx";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function HomePage() {
+  return (
+    <EEWSProvider>
+      <Home />
+    </EEWSProvider>
+  );
+}
+
+function Home() {
   const [connection, setConnection] = useState<WebSocket>();
   const { stations, packetsCount, websocketCallbacks } = useEEWS();
   useEffect(() => {
     if (!connection && Object.entries(stations).length > 0 && !!packetsCount) {
-      console.log(stations)
-      const websocket = createWSConnection("/ws", websocketCallbacks)
+      console.log(stations);
+      const websocket = createWSConnection("/ws", websocketCallbacks);
       setConnection(websocket);
     }
+    const onUnload = () => {
+      console.log("disconnecting");
+      connection?.close();
+    };
+    window.onbeforeunload = function (e) {
+      return onUnload();
+    };
   }, [connection, packetsCount, stations, websocketCallbacks]);
 
   return (
@@ -39,8 +55,7 @@ export default function Home() {
           <StationCharts />
         </div>
       </div>
-      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020
-      </footer>
+      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020</footer>
     </main>
   );
 }
