@@ -32,7 +32,6 @@ const ControlLastPacket = () => {
           {Object.keys(stations) && Object.keys(stations)
             .sort((a, b) => (a > b ? 1 : -1))
             .map((key, idx) =>{
-              console.log(`control-channel-last-packet-${key}-${idx}`)
               return (<ControlChannelLastPacket key={`control-channel-last-packet-${key}-${idx}`} {...stations[key]} />)
             })}
         </tbody>
