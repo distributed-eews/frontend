@@ -1,33 +1,39 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import { MapGL } from "@/components/Map";
-import { Navbar } from "@/components/Navbar";
-import { StationCharts } from "@/components/Charts";
-import { useEffect, useState } from "react";
-import { useEEWS } from "@/lib/hooks/useEEWS";
-import { ControlPanel } from "@/components/Panel";
-import { createWSConnection } from "@/lib/connection";
-import  { Toaster } from "react-hot-toast";
+import Image from 'next/image';
+import { Inter } from 'next/font/google';
+// import { MapGL } from "@/components/Map";
+import { Navbar } from '@/components/Navbar';
+import { StationCharts } from '@/components/Charts';
+import { useEffect, useState } from 'react';
+import { useEEWS } from '@/lib/hooks/useEEWS';
+import { ControlPanel } from '@/components/Panel';
+import { createWSConnection } from '@/lib/connection';
+import { Toaster } from 'react-hot-toast';
+import { MapGL } from '@/components/map';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [connection, setConnection] = useState<WebSocket>();
   const { stations, packetsCount, websocketCallbacks } = useEEWS();
   useEffect(() => {
     if (!connection && Object.entries(stations).length > 0 && !!packetsCount) {
-      console.log(stations)
-      const websocket = createWSConnection("/ws", websocketCallbacks)
+      console.log(stations);
+      const websocket = createWSConnection('/ws', websocketCallbacks);
       setConnection(websocket);
     }
   }, [connection, packetsCount, stations, websocketCallbacks]);
 
   return (
-    <main className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}>
+    <main
+      className={`flex min-h-screen w-full flex-col items-start ${inter.className}`}
+    >
       <Navbar />
       <div id="main-section" className="w-full">
         <Toaster />
-        <div id="map-control" className="w-full flex sticky top-0 z-20 border-2 border-indigo-950">
+        <div
+          id="map-control"
+          className="w-full flex sticky top-0 z-20 border-2 border-indigo-950"
+        >
           <div id="map" className=" w-3/4 h-[45vh]">
             <MapGL />
           </div>
@@ -39,8 +45,7 @@ export default function Home() {
           <StationCharts />
         </div>
       </div>
-      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020
-      </footer>
+      <footer className="bg-indigo-950 w-full h-32">EEWS Pacil 2020</footer>
     </main>
   );
 }
