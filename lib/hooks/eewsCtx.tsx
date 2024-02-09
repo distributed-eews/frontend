@@ -39,8 +39,28 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [group, setGroup] = useState<string[]>([]);
   const [packetsCount, setPacketsCount] = useState(50);
-  const setPEvent = (data: IPEvent) => {
+  const setMultiplePEvent = (messages: any[]) => {
+    let newData = { ...eewsData };
+    for (const message of messages) {
+      const d = message.data
+      setPEvent(
+        {
+          p_arr: d.p_arr,
+          p_arr_time: d.p_arr_time + "+00",
+          s_arr: d.s_arr,
+          s_arr_time: d.s_arr_time + "+00",
+          station_code: d.station_code,
+          type: d.type,
+        },
+        newData
+      );
+    }
+    setEewsData(newData);
+  };
+  const setPEvent = (data: IPEvent, newData: IEEWSData) => {
     const { p_arr, p_arr_time, station_code, s_arr } = data;
+    console.log("setPEvent")
+    console.log(data)
     if (p_arr && s_arr) {
       const copyStations = { ...eewsData.stations };
       copyStations[station_code].channels.forEach((chan) => {
@@ -54,35 +74,33 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const setChannelsWaveform = (data: IPacketWaveform) => {
-    const { channel, station, type } = data;
-    const old = eewsData;
-    if (type == "start") {
-      setEewsData({ ...old, stations: clearPacketsStations(old.stations) });
-      return;
+  const setMultipleWaveform = (traces: any[]) => {
+    let newData = { ...eewsData };
+    for (const t of traces) {
+      const d = t.data
+      if (d.type == "start") {
+        newData["stations"] = clearPacketsStations(newData.stations);
+        continue
+      }
+      if(d.type == "stop") {
+        continue
+      }
+      setChannelsWaveform(d, newData);
     }
-    if (type == "stop") {
-      console.log("================================================");
-      return;
-    }
+    setEewsData(newData);
+  };
+
+  const setChannelsWaveform = (data: IPacketWaveform, newData: IEEWSData) => {
+    const { channel, station } = data;
     try {
-      const copyStations = { ...old.stations };
-      const currentStations = copyStations[station];
+      const currentStations = newData["stations"][station];
       currentStations["status"] = "ACTIVE";
       const currentChannels = currentStations.channels.find((chan) => chan.code == channel);
       let chan_data = currentChannels!.waveform.data;
-      if (chan_data.length >= packetsCount) {
-        chan_data = chan_data.slice(1, packetsCount);
-      }
       chan_data.push({ ...data, recvAt: new Date().getTime() });
       currentChannels!["waveform"]["data"] = chan_data;
-      if (station == "BKB" && channel == "BHE") {
-        console.log(currentChannels?.waveform);
-      }
-      setEewsData({ ...old, stations: copyStations });
     } catch (error) {
       console.error(data);
-      console.error(old);
       console.error(error);
     }
   };
@@ -91,12 +109,23 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("Loading...");
   };
 
-  const setParams = (data: ISEvent) => {
-    console.log(data);
-    console.log(data.magnitude)
+  const setParams = (message: any) => {
+    if (!message) return;
+    const data = message.data
+    console.log("Setting parameters...");
+    console.log(data)
     setEewsData({
       ...eewsData,
-      event: data,
+      event: {
+        detectedAt: new Date(),
+        depth: data.depth,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        magnitude: data.magnitude,
+        station_codes: data.station_codes,
+        time: data.time,
+        type: data.type,
+      },
     });
   };
 
@@ -111,6 +140,7 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const setMinutes = (m: number) => {
+    console.log("setMinutes: ", m*10)
     setPacketsCount(m * 10);
   };
 
@@ -123,46 +153,26 @@ export const EEWSProvider: React.FC<{ children: React.ReactNode }> = ({ children
         group: group,
         setGroup: (grs) => {
           const ng = [...group].filter((x) => !!x && !grs.includes(x)).sort((a, b) => (a > b ? 1 : -1));
-          console.log(grs);
-          console.log([...grs, "", ...ng]);
           setGroup([...grs, "", ...ng]);
         },
         setLoading: setLoading,
         setMinutes: setMinutes,
         websocketCallbacks: (message: MessageEvent<any>) => {
-          const res = JSON.parse(message.data);
-          const topic = res.topic;
-          const data = JSON.parse(res.value);
-          if (topic == "p_arrival") {
-            setChannelsWaveform(data);
-          } else {
-            console.log(data);
-            if (data.type == "ps") {
-              console.log(data);
-              setPEvent({
-                p_arr: data.p_arr,
-                p_arr_time: data.p_arr_time+"+00",
-                s_arr: data.s_arr,
-                s_arr_time: data.s_arr_time+"+00",
-                station_code: data.station_code,
-                type: data.type,
-              });
-            } else if (data.type == "params") {
-              console.log(data);
-              console.log(typeof data)
-              console.log(data.time)
-              setParams({
-                detectedAt: new Date(),
-                depth: data.depth,
-                latitude: data.latitude,
-                longitude: data.longitude,
-                magnitude: data.magnitude,
-                station_codes: data.station_codes,
-                time: data+"+00",
-                type: data.type,
-              });
-            }
+          const res = JSON.parse(message.data) as any[];
+          if (!Array.isArray(res)) {
+            return;
           }
+          const parsed = [];
+          for (let i = 0; i < res.length; i++) {
+            parsed.push({
+              topic: res[i].topic,
+              data: JSON.parse(res[i].value),
+            });
+          }
+          console.log("From websocket: " + parsed.length);
+          setMultipleWaveform(parsed.filter((p) => p.topic == "p_arrival"));
+          setMultiplePEvent(parsed.filter((p) => p.topic != "p_arrival" && p.data.type == "ps"));
+          setParams(parsed.filter((p) => p.topic != "p_arrival" && p.data.type == "params")[0]);
         },
       }}
     >

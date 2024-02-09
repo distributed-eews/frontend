@@ -2,6 +2,7 @@ import { BACKEND_URL } from "../credentials";
 
 export const createWSConnection = (str: string, cb: (message: MessageEvent<any>) => void) => {
   const socket = new WebSocket(`ws://${BACKEND_URL}${str}`);
+  console.log("CREATEWSConnection")
   socket.onopen = () => {
     console.log("Connect");
   };

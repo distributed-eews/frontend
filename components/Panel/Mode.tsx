@@ -13,8 +13,8 @@ export const ControlMode = () => {
   const onSubmit = async () => {
     console.log(starttime)
     console.log(endtime)
-    if (!starttime || !endtime || starttime.getTime() + 1000 * 30 * 60 < endtime.getTime()) {
-      alert("Isi starttime, endtime, dan pastikan endtime tidak lebih besar dari 30 menit");
+    if (!starttime || !endtime || starttime.getTime() > endtime.getTime()) {
+      alert("Isi starttime, endtime, dan pastikan endtime tidak lebih besar dari starttime");
       return;
     }
     const res = await AxiosClient.get("/api/playback", {

@@ -1,6 +1,5 @@
-import Image from 'next/image';
 import { Inter } from 'next/font/google';
-// import { MapGL } from "@/components/Map";
+import { MapGL } from '@/components/map';
 import { Navbar } from '@/components/Navbar';
 import { StationCharts } from '@/components/Charts';
 import { useEffect, useState } from 'react';
@@ -8,11 +7,19 @@ import { useEEWS } from '@/lib/hooks/useEEWS';
 import { ControlPanel } from '@/components/Panel';
 import { createWSConnection } from '@/lib/connection';
 import { Toaster } from 'react-hot-toast';
-import { MapGL } from '@/components/map';
+import { EEWSProvider } from '@/lib/hooks/eewsCtx';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function Home() {
+export default function HomePage() {
+  return (
+    <EEWSProvider>
+      <Home />
+    </EEWSProvider>
+  );
+}
+
+function Home() {
   const [connection, setConnection] = useState<WebSocket>();
   const { stations, packetsCount, websocketCallbacks } = useEEWS();
   useEffect(() => {
@@ -21,6 +28,13 @@ export default function Home() {
       const websocket = createWSConnection('/ws', websocketCallbacks);
       setConnection(websocket);
     }
+    const onUnload = () => {
+      console.log('disconnecting');
+      connection?.close();
+    };
+    window.onbeforeunload = function (e) {
+      return onUnload();
+    };
   }, [connection, packetsCount, stations, websocketCallbacks]);
 
   return (
